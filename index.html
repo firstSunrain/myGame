@@ -471,8 +471,10 @@
         </div>
         <footer class="footer">
             <p>© 2026 夏日物语：与她的相遇</p>
-            <p>版权归属人：汪光宇 / 杨帆</p>
-            <p>All Rights Reserved.</p>
+            <p>汪光宇、杨帆 共同版权所有。保留所有权利。</p>
+            <p>未经版权所有者书面许可，不得以任何形式复制、传播或用于商业用途。</p>
+            <p>Wang Guangyu & Yang Fan. All Rights Reserved.</p>
+            <p>Unauthorized reproduction, distribution, or commercial use is prohibited.</p>
         </footer>
 
         <!-- 音乐控制界面 -->
@@ -914,8 +916,6 @@
             gameScreen.style.display = 'block';
             
             currentScript = storyData.scripts[selectedCharacter];
-
-            console.log(currentScript, 'currentScript')
             
             showCurrentDialogue();
         });
@@ -947,7 +947,6 @@
             } else {
                 dialogueAvatar.style.display = 'block';
                 const char = storyData.characters[line.character];
-                console.log(char, 'char')
                 dialogueAvatar.src = char.img;
                 dialogueAvatar.onerror = function() {
                     this.src = 'data:image/svg+xml;utf8,<svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="#34495e"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="12">头像</text></svg>';
