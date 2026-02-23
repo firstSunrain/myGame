@@ -159,7 +159,7 @@
             width: 150px;
             height: 300px;
             position: absolute;
-            top: -335px;
+            bottom: 10px;
             right: 0;
         }
 
@@ -237,7 +237,16 @@
             .character-selection {
                 grid-template-columns: 1fr;
             }
-            
+            .character-avatar {
+                object-fit: cover;
+                border: 2px solid #00ffcc;
+                margin-right: 15px;
+                width: 100px;
+                height: 200px;
+                position: absolute;
+                top: 0;
+                right: 0;
+            }
             .scene-container {
                 height: 200px;
             }
@@ -399,33 +408,33 @@
 
             <div class="character-selection">
                 <div class="character-card" data-id="1">
-                    <img src="1.png" alt="蓝发少女" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg width=\"100%\" height=\"100%\" viewBox=\"0 0 200 300\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"#3498db\"/></svg>
+                    <img src="1.png" alt="南宫昕" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg width=\"100%\" height=\"100%\" viewBox=\"0 0 200 300\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"#3498db\"/></svg>
                     <div class="character-info">
-                        <div class="character-name">蓝发少女</div>
+                        <div class="character-name">南宫昕</div>
                         <div class="character-desc">温柔文静，喜欢绘画和阅读</div>
                     </div>
                 </div>
 
                 <div class="character-card" data-id="2">
-                    <img src="2.png" alt="绿发少女" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg width=\"100%\" height=\"100%\" viewBox=\"0 0 200 300\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"#2ecc71\"/></svg>
+                    <img src="2.png" alt="爱丽丝" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg width=\"100%\" height=\"100%\" viewBox=\"0 0 200 300\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"#2ecc71\"/></svg>
                     <div class="character-info">
-                        <div class="character-name">绿发少女</div>
+                        <div class="character-name">爱丽丝</div>
                         <div class="character-desc">神秘优雅，喜欢星空和音乐</div>
                     </div>
                 </div>
 
                 <div class="character-card" data-id="3">
-                    <img src="3.png" alt="银发少女" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg width=\"100%\" height=\"100%\" viewBox=\"0 0 200 300\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"#95a5a6\"/></svg>
+                    <img src="3.png" alt="欧阳晨曦" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg width=\"100%\" height=\"100%\" viewBox=\"0 0 200 300\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"#95a5a6\"/></svg>
                     <div class="character-info">
-                        <div class="character-name">银发少女</div>
+                        <div class="character-name">欧阳晨曦</div>
                         <div class="character-desc">活泼开朗，喜欢户外活动</div>
                     </div>
                 </div>
 
                 <div class="character-card" data-id="4">
-                    <img src="4.png" alt="紫发少女" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg width=\"100%\" height=\"100%\" viewBox=\"0 0 200 300\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"#9b59b6\"/></svg>
+                    <img src="4.png" alt="铁锤妹妹" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg width=\"100%\" height=\"100%\" viewBox=\"0 0 200 300\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"100%\" height=\"100%\" fill=\"#9b59b6\"/></svg>
                     <div class="character-info">
-                        <div class="character-name">紫发少女</div>
+                        <div class="character-name">铁锤妹妹</div>
                         <div class="character-desc">浪漫梦幻，喜欢游乐园和甜点</div>
                     </div>
                 </div>
@@ -441,11 +450,12 @@
                 <div class="scene-overlay">
                     <div id="sceneTitle" class="scene-title"></div>
                 </div>
+                <img id="dialogueAvatar" class="character-avatar" src="" alt="角色头像">
             </div>
 
             <div class="dialogue-box">
                 <div class="character-display">
-                    <img id="dialogueAvatar" class="character-avatar" src="" alt="角色头像">
+                    <!-- <img id="dialogueAvatar" class="character-avatar" src="" alt="角色头像"> -->
                     <div id="dialogueName" class="character-name-display"></div>
                 </div>
                 
@@ -623,22 +633,22 @@
         const storyData = {
             characters: {
                 1: { 
-                    name: "蓝发少女", 
+                    name: "南宫昕", 
                     img: "1.png",
                     description: "温柔文静，喜欢绘画和阅读"
                 },
                 2: { 
-                    name: "银发少女", 
+                    name: "欧阳晨曦", 
                     img: "2.png",
                     description: "活泼开朗，喜欢户外活动"
                 },
                 3: { 
-                    name: "绿发少女", 
+                    name: "爱丽丝", 
                     img: "3.png",
                     description: "神秘优雅，喜欢星空和音乐"
                 },
                 4: { 
-                    name: "紫发少女", 
+                    name: "铁锤妹妹", 
                     img: "4.png",
                     description: "浪漫梦幻，喜欢游乐园和甜点"
                 }
@@ -681,7 +691,7 @@
 
             // 为每个角色定义不同的剧情线
             scripts: {
-                // 蓝发少女的剧情 - 文艺向
+                // 南宫昕的剧情 - 文艺向
                 1: [
                     {
                         scene: "home",
@@ -725,7 +735,7 @@
                     }
                 ],
 
-                // 银发少女的剧情 - 活力向
+                // 欧阳晨曦的剧情 - 活力向
                 3: [
                     {
                         scene: "park_day",
@@ -769,7 +779,7 @@
                     }
                 ],
 
-                // 绿发少女的剧情 - 神秘向
+                // 爱丽丝的剧情 - 神秘向
                 2: [
                     {
                         scene: "living_room",
@@ -813,7 +823,7 @@
                     }
                 ],
 
-                // 紫发少女的剧情 - 浪漫向
+                // 铁锤妹妹的剧情 - 浪漫向
                 4: [
                     {
                         scene: "park_night",
