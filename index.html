@@ -260,10 +260,136 @@
         .footer p {
             margin: 5px 0;
         }
+
+        /* 旋转音符容器 */
+        .music-notes-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .music-note {
+            position: absolute;
+            font-size: 40px;
+            color: #00ffcc;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.8);
+            opacity: 0.8;
+            transition: transform 0.1s linear;
+        }
+
+        /* 音乐控制按钮样式 */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .music-btn {
+            background: linear-gradient(45deg, #00ffcc, #00cc99);
+            color: #000;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 255, 204, 0.4);
+        }
+
+        /* .music-btn.playing {
+            background: linear-gradient(45deg, #ff6600, #ff3300);
+        } */
+
+        /* 旋转动画 */
+        @keyframes rotateMusic {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 播放状态：持续旋转 */
+        .music-btn.playing {
+            animation: rotateMusic 2s linear infinite;
+        }
+
+        /* 音量控制 */
+        .volume-control {
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .volume-control.show {
+            display: block;
+        }
+
+        .volume-slider {
+            width: 100px;
+            -webkit-appearance: none;
+            height: 6px;
+            background: #666;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00ffcc;
+            cursor: pointer;
+        }
+
+        /* 音乐提示 */
+        .music-notice {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .music-notice.show {
+            display: block;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            20%, 80% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        
         <!-- 选择界面 -->
         <div id="selectionScreen">
             <header>
@@ -338,9 +464,158 @@
             <p>版权归属人：汪光宇 / 杨帆</p>
             <p>All Rights Reserved.</p>
         </footer>
-    </div>
+
+        <!-- 音乐控制界面 -->
+        <div class="music-control">
+            <div class="volume-control" id="volumeControl">
+                <input type="range" min="0" max="1" step="0.1" value="0.5" class="volume-slider" id="volumeSlider">
+            </div>
+            <button class="music-btn" id="musicToggle" title="背景音乐控制">
+                ♪
+            </button>
+        </div>
+        <audio id="bgm" loop preload="auto">
+            <source src="bgm.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放。
+        </audio>
 
     <script>
+        // 音乐控制系统
+        class MusicController {
+            constructor() {
+                this.audio = document.getElementById('bgm');
+                this.musicToggle = document.getElementById('musicToggle');
+                this.volumeSlider = document.getElementById('volumeSlider');
+                this.volumeControl = document.getElementById('volumeControl');
+                this.musicNotice = document.getElementById('musicNotice');
+                this.isPlaying = false;
+                this.volume = 0.5; // 默认音量50%
+                
+                this.init();
+            }
+            
+            init() {
+                // 设置初始音量
+                this.audio.volume = this.volume;
+                this.volumeSlider.value = this.volume;
+                
+                // 绑定事件
+                this.musicToggle.addEventListener('click', () => this.toggleMusic());
+                this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
+                this.musicToggle.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    this.toggleVolumeControl();
+                });
+                
+                // 页面点击隐藏音量控制
+                document.addEventListener('click', (e) => {
+                    if (!this.volumeControl.contains(e.target) && e.target !== this.musicToggle) {
+                        this.volumeControl.classList.remove('show');
+                    }
+                });
+                
+                // 尝试自动播放
+                this.attemptAutoPlay();
+            }
+            
+            attemptAutoPlay() {
+                const playPromise = this.audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        this.isPlaying = true;
+                        this.musicToggle.classList.add('playing');
+                        this.showNotice('背景音乐已开始播放');
+                    }).catch(error => {
+                        console.log('自动播放被阻止，需要用户交互');
+                        this.isPlaying = false;
+                        this.musicToggle.classList.remove('playing');
+                    });
+                }
+            }
+            
+            toggleMusic() {
+                if (this.isPlaying) {
+                    this.pauseMusic();
+                } else {
+                    this.playMusic();
+                }
+            }
+            
+            playMusic() {
+                this.audio.play().then(() => {
+                    this.isPlaying = true;
+                    this.musicToggle.classList.add('playing');
+                    this.showNotice('背景音乐已开始播放');
+                }).catch(error => {
+                    console.log('播放失败:', error);
+                });
+            }
+            
+            pauseMusic() {
+                this.audio.pause();
+                this.isPlaying = false;
+                this.musicToggle.classList.remove('playing');
+                this.showNotice('背景音乐已暂停');
+            }
+            
+            setVolume(value) {
+                this.volume = parseFloat(value);
+                this.audio.volume = this.volume;
+                
+                // 如果静音了，停止播放
+                if (this.volume === 0 && this.isPlaying) {
+                    this.pauseMusic();
+                } else if (this.volume > 0 && !this.isPlaying) {
+                    this.playMusic();
+                }
+            }
+            
+            toggleVolumeControl() {
+                this.volumeControl.classList.toggle('show');
+            }
+            
+            showNotice(message) {
+                // this.musicNotice.textContent = message;
+                // this.musicNotice.classList.add('show');
+                
+                // setTimeout(() => {
+                //     this.musicNotice.classList.remove('show');
+                // }, 2000);
+            }
+            
+            // 添加音乐控制到现有脚本中
+            static integrateWithGame() {
+                window.addEventListener('DOMContentLoaded', () => {
+                    const musicController = new MusicController();
+                    
+                    // 在故事开始时调整音乐
+                    document.getElementById('startButton')?.addEventListener('click', () => {
+                        if (musicController.isPlaying) {
+                            musicController.audio.volume = 0.3; // 降低背景音乐音量
+                        }
+                    });
+                    
+                    // 故事结束时恢复音乐音量
+                    const originalShowEnding = window.showEnding;
+                    if (originalShowEnding) {
+                        window.showEnding = function() {
+                            originalShowEnding.apply(this, arguments);
+                            if (musicController.isPlaying) {
+                                musicController.audio.volume = 0.5; // 恢复背景音乐音量
+                            }
+                        };
+                    }
+                    
+                    // 保存控制器引用
+                    window.musicController = musicController;
+                });
+            }
+        }
+
+        // 初始化音乐控制系统
+        MusicController.integrateWithGame();
+
         // 剧情数据
         const storyData = {
             characters: {
@@ -616,14 +891,17 @@
                 alert('请先选择一个角色！');
                 return;
             }
-            
+
+            // 🎵 点击开始时播放音乐
+            if (window.musicController && !window.musicController.isPlaying) {
+                window.musicController.playMusic();
+            }
+
             selectionScreen.style.display = 'none';
             gameScreen.style.display = 'block';
             
-            // 加载对应角色的剧情
             currentScript = storyData.scripts[selectedCharacter];
             
-            // 初始化第一个场景
             showCurrentDialogue();
         });
 
